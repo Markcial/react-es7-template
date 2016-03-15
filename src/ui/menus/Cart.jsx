@@ -8,17 +8,20 @@ import RaisedButton from 'material-ui/lib/raised-button';
 import FontIcon from 'material-ui/lib/font-icon';
 import NotificationsIcon from 'material-ui/lib/svg-icons/social/notifications';
 
-class CartItem extends React.Component {
+import {connect} from "react-redux";
+import {Actions} from 'rx/reducers/ui';
+
+class CartMenu extends React.Component {
+
   state = {
-    title: '',
-    price: 0,
-    total: 0
+    items: []
   }
-}
 
-export default class CartMenu extends React.Component {
+  static propTypes = {
+    items: React.PropTypes.array.isRequired
+  }
 
-  state = {
+  static defaultProps = {
     items: []
   }
 
@@ -29,16 +32,18 @@ export default class CartMenu extends React.Component {
   }
 
   getItemCount() {
-    return this.state.items.length;
+    return this.props.items.length;
   }
 
   getTotalSpent() {
     let total = 0;
-    this.state.items.map( (item) => total += item.total );
-    return total;
+    this.props.items.map( (item) => total += item.value );
+    return total.toFixed(2);
   }
 
   render() {
+    const {items} = this.props;
+    console.log(items);
     return <IconMenu
       iconButtonElement={
         <Badge
@@ -57,9 +62,15 @@ export default class CartMenu extends React.Component {
       targetOrigin={{horizontal: 'right', vertical: 'top'}}
       anchorOrigin={{horizontal: 'right', vertical: 'top'}}
       >
-        {this.state.items.map ( (item) => {
-          <MenuItem primaryText={item.state.title} />
-        })}
+        {items.map ( (item) =>
+          <MenuItem primaryText={item.name} />
+        )}
     </IconMenu>
   }
 }
+
+var mapStateToProps = function(state){
+	return {items:state.ui.items};
+};
+
+export default connect(mapStateToProps)(CartMenu);
